@@ -1,314 +1,539 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>📈 股票顶盘</title>
-  <style>
-    /* === 妙答波普风格变量 === */
-    :root {
-      --primary: #FFDE00;
-      --accent-red: #FF3B30;
-      --accent-green: #4CD964;
-      --accent-blue: #007AFF;
-      --black: #000000;
-      --white: #FFFFFF;
-      --card-bg: #FFFFFF;
-      --border-width: 6px;
-      --shadow: 8px 8px 0px var(--black);
-      --radius: 20px;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>📈 股票顶盘</title>
+<style>
+/* === 妙答波普风格变量 === */
+:root {
+  --primary: #FFDE00;
+  --blue: #3377ee;
+  --red: #ee3333;
+  --yellow-bg: #fff9cc;
+  --white: #ffffff;
+  --black: #000000;
+  --border: 4px solid var(--black);
+  --radius: 16px;
+  --shadow: 4px 4px 0px var(--black);
+}
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
-      background: var(--primary);
-      /* 波普风网点纹理 */
-      background-image: radial-gradient(circle, rgba(0,0,0,0.08) 1px, transparent 1px);
-      background-size: 20px 20px;
-      min-height: 100vh;
-      padding: 20px;
-    }
+body {
+  background: var(--primary);
+  background-image: radial-gradient(circle, rgba(0,0,0,0.07) 1.5px, transparent 1.5px);
+  background-size: 18px 18px;
+  min-height: 100vh;
+  padding: 16px;
+  -webkit-tap-highlight-color: transparent;
+}
 
-    /* === 顶部标题卡 === */
-    .header-card {
-      background: var(--black);
-      border: var(--border-width) solid var(--black);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 24px 20px;
-      margin-bottom: 20px;
-      text-align: center;
-    }
+/* === 顶部标题 === */
+.header {
+  background: var(--black);
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header-title {
+  color: var(--primary);
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+.header-badge {
+  background: var(--red);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 2px solid var(--white);
+}
 
-    .header-title {
-      color: var(--primary);
-      font-size: 28px;
-      font-weight: 900;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
+/* === 过滤器 === */
+.filter-card {
+  background: var(--white);
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+.filter-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.filter-row:last-child { margin-bottom: 0; }
+.filter-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #666;
+  min-width: 48px;
+}
+.filter-btn {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  border: 3px solid var(--black);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.filter-btn:active { transform: scale(0.95); }
+.filter-btn.off {
+  background: #f0f0f0;
+  color: #888;
+}
+.filter-btn.on-yellow {
+  background: var(--primary);
+  color: var(--black);
+}
+.filter-btn.on-blue {
+  background: var(--blue);
+  color: white;
+}
+.filter-btn.on-red {
+  background: var(--red);
+  color: white;
+}
 
-    .header-subtitle {
-      color: var(--white);
-      font-size: 14px;
-      margin-top: 6px;
-      opacity: 0.8;
-    }
+/* === 统计概览 === */
+.stats-card {
+  background: var(--white);
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.stat-item { text-align: center; }
+.stat-label { font-size: 11px; color: #888; font-weight: 600; text-transform: uppercase; margin-bottom: 2px; }
+.stat-value { font-size: 18px; font-weight: 900; }
+.stat-value.up { color: var(--red); }
+.stat-value.down { color: #00a854; }
 
-    /* === 统计概览卡 === */
-    .stats-card {
-      background: var(--white);
-      border: var(--border-width) solid var(--black);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 20px;
-      margin-bottom: 20px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
+/* === 个股卡片 === */
+.stock-card {
+  background: var(--white);
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px;
+  margin-bottom: 12px;
+  transition: transform 0.12s;
+}
+.stock-card:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--black); }
+.stock-card.hidden { display: none; }
 
-    .stat-item {
-      text-align: center;
-    }
+.stock-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.stock-name {
+  font-size: 17px;
+  font-weight: 900;
+  color: var(--black);
+}
+.stock-tags { display: flex; gap: 6px; }
+.tag-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 2px solid var(--black);
+}
+.tag-time { background: var(--blue); color: white; }
+.tag-level-high { background: var(--red); color: white; }
+.tag-level-mid { background: var(--primary); color: var(--black); }
+.tag-level-low { background: #aaa; color: white; }
 
-    .stat-label {
-      font-size: 12px;
-      color: #666;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 4px;
-    }
+.stock-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.stock-price-block { }
+.stock-code {
+  font-size: 12px;
+  color: #888;
+  background: #f5f5f5;
+  border: 2px solid #ddd;
+  border-radius: 999px;
+  padding: 2px 8px;
+  margin-bottom: 4px;
+  display: inline-block;
+}
+.stock-price {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--black);
+}
+.stock-change {
+  font-size: 14px;
+  font-weight: 700;
+  margin-left: 6px;
+}
+.stock-change.up { color: var(--red); }
+.stock-change.down { color: #00a854; }
 
-    .stat-value {
-      font-size: 22px;
-      font-weight: 900;
-      color: var(--black);
-    }
+.stock-actions { display: flex; gap: 8px; }
 
-    .stat-value.positive { color: var(--accent-green); }
-    .stat-value.negative { color: var(--accent-red); }
+/* === 波普风按钮 === */
+.pop-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 800;
+  border: 3px solid var(--black);
+  box-shadow: 3px 3px 0px var(--black);
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--black);
+  background: var(--primary);
+  transition: all 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.pop-btn:active { transform: translate(1.5px, 1.5px); box-shadow: 1.5px 1.5px 0px var(--black); }
+.pop-btn.blue { background: var(--blue); color: white; }
+.pop-btn.gray { background: #f5f5f5; color: #666; }
+.pop-btn.red { background: var(--red); color: white; }
 
-    /* === 个股卡片 === */
-    .stock-card {
-      background: var(--white);
-      border: var(--border-width) solid var(--black);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 18px 16px;
-      margin-bottom: 16px;
-      transition: transform 0.15s ease;
-    }
+/* === 详情弹窗 === */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.modal-overlay.show { display: flex; }
 
-    .stock-card:active {
-      transform: translate(4px, 4px);
-      box-shadow: 4px 4px 0px var(--black);
-    }
+.modal-card {
+  background: var(--white);
+  border: 5px solid var(--black);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 8px 8px 0px var(--black);
+}
 
-    .stock-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 12px;
-    }
+.modal-header {
+  padding: 16px 16px 0;
+}
+.modal-tags { display: flex; gap: 8px; margin-bottom: 12px; }
+.modal-tag {
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  border: 3px solid var(--black);
+  color: white;
+}
+.modal-title {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--black);
+  margin-bottom: 14px;
+}
+.modal-time-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.modal-col-card {
+  flex: 1;
+  border: 3px solid var(--black);
+  border-radius: 12px;
+  padding: 12px;
+}
+.modal-col-card.yellow { background: var(--yellow-bg); }
+.modal-col-card.white { background: var(--white); }
+.modal-col-label { font-size: 12px; color: #888; font-weight: 600; margin-bottom: 4px; }
+.modal-col-value { font-size: 14px; font-weight: 800; }
 
-    .stock-name {
-      font-size: 18px;
-      font-weight: 900;
-      color: var(--black);
-    }
+.modal-content-card {
+  background: var(--yellow-bg);
+  border: 4px solid var(--black);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 0 16px 14px;
+}
+.modal-content-label { font-size: 12px; color: #888; font-weight: 600; margin-bottom: 6px; }
+.modal-content-text { font-size: 16px; font-weight: 600; line-height: 1.4; }
 
-    .stock-code {
-      font-size: 12px;
-      color: #888;
-      background: #f0f0f0;
-      padding: 2px 8px;
-      border-radius: 10px;
-      border: 2px solid #ddd;
-    }
+.modal-tip {
+  background: var(--red);
+  border: 4px solid var(--black);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin: 0 16px 18px;
+  color: white;
+}
+.modal-tip-title { font-size: 16px; font-weight: 900; display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.modal-tip-text { font-size: 13px; line-height: 1.5; }
 
-    .stock-bottom {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+.modal-footer {
+  padding: 0 16px 16px;
+  display: flex;
+  gap: 10px;
+}
+.modal-btn {
+  flex: 1;
+  padding: 14px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 800;
+  border: 3px solid var(--black);
+  cursor: pointer;
+  text-align: center;
+}
+.modal-btn.blue { background: var(--blue); color: white; }
+.modal-btn.gray { background: #f0f0f0; color: #666; }
 
-    .stock-price-block {
-      text-align: left;
-    }
-
-    .stock-price {
-      font-size: 26px;
-      font-weight: 900;
-      color: var(--black);
-    }
-
-    .stock-change {
-      font-size: 14px;
-      font-weight: 700;
-      margin-left: 8px;
-    }
-
-    .stock-change.up { color: var(--accent-red); }
-    .stock-change.down { color: var(--accent-green); }
-
-    /* === 波普风按钮 === */
-    .pop-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--primary);
-      color: var(--black);
-      font-size: 14px;
-      font-weight: 900;
-      text-decoration: none;
-      border: 4px solid var(--black);
-      border-radius: 12px;
-      padding: 10px 16px;
-      box-shadow: 4px 4px 0px var(--black);
-      cursor: pointer;
-      transition: all 0.1s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .pop-btn:active {
-      transform: translate(2px, 2px);
-      box-shadow: 2px 2px 0px var(--black);
-    }
-
-    .pop-btn.blue {
-      background: var(--accent-blue);
-      color: var(--white);
-    }
-
-    /* === 底部 === */
-    .footer {
-      text-align: center;
-      margin-top: 24px;
-      font-size: 12px;
-      color: rgba(0,0,0,0.5);
-    }
-
-    /* === 3D按钮按压效果 === */
-    @media (hover: hover) {
-      .pop-btn:hover {
-        transform: translate(2px, 2px);
-        box-shadow: 2px 2px 0px var(--black);
-      }
-    }
-  </style>
+/* === 底部 === */
+.footer {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 11px;
+  color: rgba(0,0,0,0.4);
+}
+</style>
 </head>
 <body>
 
-  <!-- 标题卡 -->
-  <div class="header-card">
-    <div class="header-title">📈 股票顶盘</div>
-    <div class="header-subtitle">持仓日报 · 实时追踪</div>
-  </div>
+<!-- 标题 -->
+<div class="header">
+  <div class="header-title">📈 股票顶盘</div>
+  <div class="header-badge">LIVE</div>
+</div>
 
-  <!-- 统计概览 -->
-  <div class="stats-card">
-    <div class="stat-item">
-      <div class="stat-label">总市值</div>
-      <div class="stat-value">¥167,410</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-label">今日盈亏</div>
-      <div class="stat-value positive">+¥810 (+0.49%)</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-label">持仓成本</div>
-      <div class="stat-value">¥166,600</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-label">持仓收益</div>
-      <div class="stat-value positive">+¥810 (+0.49%)</div>
-    </div>
+<!-- 过滤器 -->
+<div class="filter-card">
+  <div class="filter-row">
+    <span class="filter-label">等级</span>
+    <button class="filter-btn on-yellow" data-filter="level" data-value="all">全部</button>
+    <button class="filter-btn off" data-filter="level" data-value="high">高</button>
+    <button class="filter-btn off" data-filter="level" data-value="mid">中</button>
+    <button class="filter-btn off" data-filter="level" data-value="low">低</button>
   </div>
-
-  <!-- 贵州茅台 -->
-  <div class="stock-card">
-    <div class="stock-top">
-      <div>
-        <div class="stock-name">贵州茅台</div>
-        <span class="stock-code">SH 600519</span>
-      </div>
-    </div>
-    <div class="stock-bottom">
-      <div class="stock-price-block">
-        <span class="stock-price">¥1,680.00</span>
-        <span class="stock-change up">+1.50% ▲</span>
-      </div>
-      <a href="https://xueqiu.com/S/SH600519" target="_blank" class="pop-btn blue">
-        📊 雪球
-      </a>
-    </div>
+  <div class="filter-row">
+    <span class="filter-label">时段</span>
+    <button class="filter-btn on-yellow" data-filter="time" data-value="all">全部</button>
+    <button class="filter-btn off" data-filter="time" data-value="pre">盘前</button>
+    <button class="filter-btn off" data-filter="time" data-value="mid">盘中</button>
+    <button class="filter-btn off" data-filter="time" data-value="after">盘后</button>
   </div>
+</div>
 
-  <!-- 宁德时代 -->
-  <div class="stock-card">
-    <div class="stock-top">
-      <div>
-        <div class="stock-name">宁德时代</div>
-        <span class="stock-code">SZ 300750</span>
-      </div>
-    </div>
-    <div class="stock-bottom">
-      <div class="stock-price-block">
-        <span class="stock-price">¥185.50</span>
-        <span class="stock-change up">+2.30% ▲</span>
-      </div>
-      <a href="https://xueqiu.com/S/SZ300750" target="_blank" class="pop-btn blue">
-        📊 雪球
-      </a>
-    </div>
+<!-- 统计 -->
+<div class="stats-card">
+  <div class="stat-item">
+    <div class="stat-label">总市值</div>
+    <div class="stat-value">¥167,410</div>
   </div>
-
-  <!-- 中国平安 -->
-  <div class="stock-card">
-    <div class="stock-top">
-      <div>
-        <div class="stock-name">中国平安</div>
-        <span class="stock-code">SH 601318</span>
-      </div>
-    </div>
-    <div class="stock-bottom">
-      <div class="stock-price-block">
-        <span class="stock-price">¥45.20</span>
-        <span class="stock-change down">-0.60% ▼</span>
-      </div>
-      <a href="https://xueqiu.com/S/SH601318" target="_blank" class="pop-btn blue">
-        📊 雪球
-      </a>
-    </div>
+  <div class="stat-item">
+    <div class="stat-label">今日盈亏</div>
+    <div class="stat-value up">+¥810 (+0.49%)</div>
   </div>
+</div>
 
-  <!-- 腾讯控股 -->
-  <div class="stock-card">
-    <div class="stock-top">
-      <div>
-        <div class="stock-name">腾讯控股</div>
-        <span class="stock-code">HK 00700</span>
+<!-- 股票列表 -->
+<div id="stock-list"></div>
+
+<!-- 详情弹窗 -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal-card" id="modalCard">
+    <!-- 动态填充 -->
+  </div>
+</div>
+
+<div class="footer">
+  数据来源：雪球 · 股票顶盘Bot<br>
+  更新时间：2026-04-21 09:30
+</div>
+
+<script>
+// 股票数据
+const stocks = [
+  {
+    name: "宁德时代", code: "300750", market: "SZ",
+    price: "185.50", change: "+2.30%", dir: "up",
+    level: "high", time: "mid",
+    title: "波动率提醒",
+    content: "宁德时代五分钟内波动超过2%，成交额急剧放大。请注意风险控制。",
+    alertTime: "14:20:00", date: "2024年4月17日"
+  },
+  {
+    name: "贵州茅台", code: "600519", market: "SH",
+    price: "1,680.00", change: "+1.50%", dir: "up",
+    level: "mid", time: "mid",
+    title: "价格异动提醒",
+    content: "贵州茅台今日涨势强劲，突破近期新高，成交量放大。",
+    alertTime: "10:35:00", date: "2024年4月17日"
+  },
+  {
+    name: "中国平安", code: "601318", market: "SH",
+    price: "45.20", change: "-0.60%", dir: "down",
+    level: "mid", time: "mid",
+    title: "持仓风险提示",
+    content: "中国平安股价小幅回落，基本面稳定，关注60日均线支撑。",
+    alertTime: "11:45:00", date: "2024年4月17日"
+  },
+  {
+    name: "腾讯控股", code: "00700", market: "HK",
+    price: "320.00", change: "+1.20%", dir: "up",
+    level: "low", time: "after",
+    title: "盘后快讯",
+    content: "腾讯控股盘后公布业绩预告超预期，多家机构上调目标价。",
+    alertTime: "16:15:00", date: "2024年4月17日"
+  }
+];
+
+let currentLevel = "all";
+let currentTime = "all";
+
+function getXueqiuUrl(code, market) {
+  if (market === "HK") return `https://xueqiu.com/S/HK${code}`;
+  if (market === "SH") return `https://xueqiu.com/S/SH${code}`;
+  return `https://xueqiu.com/S/SZ${code}`;
+}
+
+function getLevelTag(level) {
+  const map = { high: ["高", "tag-level-high"], mid: ["中", "tag-level-mid"], low: ["低", "tag-level-low"] };
+  return map[level] || ["中", "tag-level-mid"];
+}
+
+function getTimeTag(time) {
+  const map = { pre: "盘前", mid: "盘中", after: "盘后" };
+  return map[time] || "盘中";
+}
+
+function renderStocks() {
+  const list = document.getElementById("stock-list");
+  list.innerHTML = "";
+  stocks.forEach((s, i) => {
+    const levelOk = currentLevel === "all" || s.level === currentLevel;
+    const timeOk = currentTime === "all" || s.time === currentTime;
+    if (!levelOk || !timeOk) return;
+
+    const [levelText, levelClass] = getLevelTag(s.level);
+    const timeTag = getTimeTag(s.time);
+
+    const card = document.createElement("div");
+    card.className = "stock-card";
+    card.innerHTML = `
+      <div class="stock-header">
+        <div class="stock-name">${s.name}</div>
+        <div class="stock-tags">
+          <span class="tag-pill tag-time">${timeTag}</span>
+          <span class="tag-pill ${levelClass}">${levelText}</span>
+        </div>
+      </div>
+      <div class="stock-body">
+        <div class="stock-price-block">
+          <div class="stock-code">${s.market} ${s.code}</div>
+          <div>
+            <span class="stock-price">¥${s.price}</span>
+            <span class="stock-change ${s.dir}">${s.change} ${s.dir === "up" ? "▲" : "▼"}</span>
+          </div>
+        </div>
+        <div class="stock-actions">
+          <button class="pop-btn gray" onclick="openDetail(${i})">查看详情</button>
+          <a href="${getXueqiuUrl(s.code, s.market)}" target="_blank" class="pop-btn blue">📊 雪球</a>
+        </div>
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+function openDetail(i) {
+  const s = stocks[i];
+  const [levelText, levelClass] = getLevelTag(s.level);
+  const timeTag = getTimeTag(s.time);
+
+  const modal = document.getElementById("detailModal");
+  const card = document.getElementById("modalCard");
+  card.innerHTML = `
+    <div class="modal-header">
+      <div class="modal-tags">
+        <span class="modal-tag" style="background:var(--blue)">${timeTag}</span>
+        <span class="modal-tag ${levelClass === 'tag-level-high' ? 'style=background:var(--red)' : levelClass === 'tag-level-mid' ? 'style=background:var(--primary);color:#000' : 'style=background:#aaa'}">${levelText}</span>
+      </div>
+      <div class="modal-title">${s.title}</div>
+      <div class="modal-time-row">
+        <div class="modal-col-card white">
+          <div class="modal-col-label">发布时间</div>
+          <div class="modal-col-value">⏰ ${s.date} ${s.alertTime}</div>
+        </div>
+        <div class="modal-col-card yellow">
+          <div class="modal-col-label">关联股票</div>
+          <div class="modal-col-value" style="background:var(--yellow-bg);border:3px solid var(--black);border-radius:999px;padding:4px 14px;display:inline-block;font-weight:900;">${s.code}</div>
+        </div>
       </div>
     </div>
-    <div class="stock-bottom">
-      <div class="stock-price-block">
-        <span class="stock-price">HK$320.00</span>
-        <span class="stock-change up">+1.20% ▲</span>
-      </div>
-      <a href="https://xueqiu.com/S/HK00700" target="_blank" class="pop-btn blue">
-        📊 雪球
-      </a>
+    <div class="modal-content-card">
+      <div class="modal-content-label">消息内容</div>
+      <div class="modal-content-text">${s.content}</div>
     </div>
-  </div>
+    <div class="modal-tip">
+      <div class="modal-tip-title">⚠️ 重要提示</div>
+      <div class="modal-tip-text">本内容仅供信息参考，不构成任何投资建议。投资有风险，决策需谨慎。请根据自身情况独立判断。</div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn gray" onclick="closeDetail()">← 返回列表</button>
+      <button class="modal-btn gray" style="background:#eee">🔔 已标记</button>
+    </div>`;
+  modal.classList.add("show");
+  modal.onclick = (e) => { if (e.target === modal) closeDetail(); };
+}
 
-  <!-- 底部 -->
-  <div class="footer">
-    数据来源：雪球 · 股票顶盘Bot<br>
-    更新时间：2026-04-21 09:30
-  </div>
+function closeDetail() {
+  document.getElementById("detailModal").classList.remove("show");
+}
 
+// 过滤器
+document.querySelectorAll(".filter-btn").forEach(btn => {
+  btn.onclick = () => {
+    const filter = btn.dataset.filter;
+    const value = btn.dataset.value;
+    document.querySelectorAll(`.filter-btn[data-filter="${filter}"]`).forEach(b => {
+      if (b.dataset.value === "all") {
+        b.className = "filter-btn " + (value === "all" ? "on-yellow" : "off");
+      } else if (b.dataset.value === value) {
+        b.className = "filter-btn on-" + (filter === "level" ? "red" : "blue");
+      } else {
+        b.className = "filter-btn off";
+      }
+    });
+    if (filter === "level") currentLevel = value;
+    if (filter === "time") currentTime = value;
+    renderStocks();
+  };
+});
+
+renderStocks();
+</script>
 </body>
 </html>
